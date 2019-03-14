@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        
+        <title>
+            Sign Up page
+        </title>
+        
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+        <!-- <link rel="stylesheet" href="file:///home/abhijith/Desktop/Colloqi/bootstrap/css/bootstrap.min.css"> -->
+        
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+        <!-- <link rel="stylesheet" href="file:///home/abhijith/Desktop/Colloqi/font/css/all.css" > -->
+        
+    </head>
+    <body>
+        <div class="container">
+            <div class="d-flex h-100 justify-content-center ">
+                <div class="card mt-5 ml-5 shadow-lg p-4 mb-4 bg-white">
+
+                        <!-- CARD HEADER -->
+                        <div class="d-flex card-header justify-content-center">
+                            <h3>Sign-Up</h3>
+                        </div>
+                        
+                        <!-- CARD BODY -->
+                        <div class="card-body">
+                            <form class='form-signin', action='/signup', method='post'>   
+                                <!-- <div class="form-inline mb-3">
+                                    <div class="form-group input-group mr-2">
+                                        <input type="text" name='firstName' class="form-control" placeholder="First Name" >
+                                    </div>
+                                    <div class="form-group input-group">
+                                            <input type="text" name='lastName' class="form-control" placeholder="Last Name" >
+                                    </div>
+                                </div> -->
+        
+                                <div class="form-group input-group">
+                                    <input type="text" name="username" class="form-control" placeholder="Username" >
+                                </div>
+
+                                <div class="form-group input-group">
+                                        <div class="input-group-prepend">
+                                          <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                        </div>
+                                        <input type="email" name="email" class="form-control" placeholder="user-email" >
+                                </div>
+    
+                                <div class="form-group input-group">
+                                        <div class="input-group-prepend">
+                                          <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                        </div>
+                                        <input type="password" name="password" class="form-control" placeholder="user-password">
+                                </div>
+    
+                                <div class="form-group input-group">
+                                        <div class="input-group-prepend">
+                                          <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                        </div>
+                                        <input type="password" name="password2" class="form-control" placeholder="Confirm password">
+                                </div>
+    
+                                <div class="d-flex justify-content-center form-group">
+                                    <input type="submit" value="Sign In" class="btn btn-block btn-info">    
+                                </div>
+                                
+                                <div>
+                                    <hr>
+                                </div>
+
+                                <!-- registration can happen in the login page itself -->
+    
+                                <!-- <div class="form-group">
+                                    <a class="btn btn-block btn-danger" href="#">
+                                            <i class="fab fa-google"></i> Sign up using Google</a>
+                                    <a class="btn btn-block btn-primary" href="#">
+                                        <i class="fab fa-facebook-f"></i> Sign up using Facebook </a>
+                                    <a class="btn btn-block btn-warning" href="#">
+                                        <i class="fab fa-aws"></i> Sign up using AWS </a>
+                                </div> -->
+    
+    
+                            </form>
+                      
+                        </div>
+    
+                    </div>
+
+            </div>
+        </div>
+    </body>
+</html>
+
+                <!-- signup form in a card -->
