@@ -193,69 +193,69 @@ module.exports = function(passport){
 
 	})
 
-	router.get('/reset/:token', function(req, res) {
-		User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
-			if (!user) {
-				req.flash('error', 'Password reset token is invalid or has expired.');
-				return res.redirect('/forgot');
-			}
-			res.sendFile(__dirname+'/'+"reset.html", {token: req.params.token});
-		});
-	});
+	// router.get('/reset/:token', function(req, res) {
+	// 	User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+	// 		if (!user) {
+	// 			req.flash('error', 'Password reset token is invalid or has expired.');
+	// 			return res.redirect('/forgot');
+	// 		}
+	// 		res.sendFile(__dirname+'/'+"reset.html", {token: req.params.token});
+	// 	});
+	// });
 
-	router.post('/reset/:token', function(req, res) {
-		async.waterfall([
-			function(done) {
-				User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
-					if (!user) {
-						req.flash('error', 'Password reset token is invalid or has expired.');
-						return res.redirect('back');
-					}
-					if(req.body.password === req.body.confirm) {
-						user.setPassword(req.body.password, function(err) {
-							user.resetPasswordToken = undefined;
-							user.resetPasswordExpires = undefined;
+	// router.post('/reset/:token', function(req, res) {
+	// 	async.waterfall([
+	// 		function(done) {
+	// 			User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+	// 				if (!user) {
+	// 					req.flash('error', 'Password reset token is invalid or has expired.');
+	// 					return res.redirect('back');
+	// 				}
+	// 				if(req.body.password === req.body.confirm) {
+	// 					user.setPassword(req.body.password, function(err) {
+	// 						user.resetPasswordToken = undefined;
+	// 						user.resetPasswordExpires = undefined;
 	
-							user.save(function(err) {
-								req.logIn(user, function(err) {
-									done(err, user);
-								});
-							});
-						})
-					} else {
-							req.flash("error", "Passwords do not match.");
-							return res.redirect('back');
-					}
-				});
-			},
-			function(user, done) {
-				var smtpTransport = nodemailer.createTransport({
-					service: 'Gmail', 
-					auth: {
-						type: 'OAuth2',
-						user:'b.n.abhijith@gmail.com',
-						clientId: '500226019228-jeuia4kl1ponqdg2qjlv98kc8fn9u4ks.apps.googleusercontent.com',
-						clientSecret: '9mekItXlYZakgcOYf2sH-wj3',
-						refreshToken: '1/aEThnTrtQ92nGU3sP8Y-cvRgpaECi2lyd0r9BgLn6r8',
-						accessToken: 'ya29.Glu_BtnBFuVzwpbpyMSzNJ5xOzYJwad1S1PcHU7wEz6fk3RvEY4f-Mgv1wZYGDkBES4Ex7CZxEyNXs-AADQ_eCsEjJ8luyyrwnxnTnNr7QFuEKStM-JyjKSgF_Ts'
-					}
-				});
-				var mailOptions = {
-					to: user.email,
-					from: 'b.n.abhijith@mail.com',
-					subject: 'Your password has been changed',
-					text: 'Hello,\n\n' +
-						'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
-				};
-				smtpTransport.sendMail(mailOptions, function(err) {
-					req.flash('success', 'Success! Your password has been changed.');
-					done(err);
-				});
-			}
-		], function(err) {
-			res.redirect('/');
-		});
-	});
+	// 						user.save(function(err) {
+	// 							req.logIn(user, function(err) {
+	// 								done(err, user);
+	// 							});
+	// 						});
+	// 					})
+	// 				} else {
+	// 						req.flash("error", "Passwords do not match.");
+	// 						return res.redirect('back');
+	// 				}
+	// 			});
+	// 		},
+	// 		function(user, done) {
+	// 			var smtpTransport = nodemailer.createTransport({
+	// 				service: 'Gmail', 
+	// 				auth: {
+	// 					type: 'OAuth2',
+	// 					user:'b.n.abhijith@gmail.com',
+	// 					clientId: '500226019228-jeuia4kl1ponqdg2qjlv98kc8fn9u4ks.apps.googleusercontent.com',
+	// 					clientSecret: '9mekItXlYZakgcOYf2sH-wj3',
+	// 					refreshToken: '1/aEThnTrtQ92nGU3sP8Y-cvRgpaECi2lyd0r9BgLn6r8',
+	// 					accessToken: 'ya29.Glu_BtnBFuVzwpbpyMSzNJ5xOzYJwad1S1PcHU7wEz6fk3RvEY4f-Mgv1wZYGDkBES4Ex7CZxEyNXs-AADQ_eCsEjJ8luyyrwnxnTnNr7QFuEKStM-JyjKSgF_Ts'
+	// 				}
+	// 			});
+	// 			var mailOptions = {
+	// 				to: user.email,
+	// 				from: 'b.n.abhijith@mail.com',
+	// 				subject: 'Your password has been changed',
+	// 				text: 'Hello,\n\n' +
+	// 					'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
+	// 			};
+	// 			smtpTransport.sendMail(mailOptions, function(err) {
+	// 				req.flash('success', 'Success! Your password has been changed.');
+	// 				done(err);
+	// 			});
+	// 		}
+	// 	], function(err) {
+	// 		res.redirect('/');
+	// 	});
+	// });
 	
 
 
