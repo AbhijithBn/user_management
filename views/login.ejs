@@ -14,6 +14,44 @@
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
         <!-- <link rel="stylesheet" href="../font/css/all.css" > -->
 
+        <link href="https://fonts.googleapis.com/css?family=Arvo&display=swap" rel="stylesheet">
+
+        <style>
+        body{
+            background-color: rgb(8, 79, 100);
+            font-family: 'Arvo', serif;
+        }
+        h3{
+            font-family: 'Arvo', serif;       
+        }
+        .card{
+            border-radius: 20px;
+        }
+        .card-header{
+            border: white;
+            background-color:white;
+            color: rgba(14, 125, 168, 0.972);
+        }
+        .input-group-text{
+            color: rgb(255, 255, 255);
+            background-color: rgba(113, 210, 248, 0.972);
+        }
+        input::placeholder{
+            color: rgba(113, 210, 248, 0.972);
+        }
+        hr{
+            background-color: rgb(162, 177, 189)
+        }
+        .card-footer{
+            background-color: white;
+            border-top: 2px solid rgb(21, 134, 168);
+        }
+        div{
+            text-align: center;    
+        }
+        input{
+        }
+        </style>
     </head>
     <body>
         <!-- control over entire area of the webpage -->
@@ -27,7 +65,7 @@
 
                     <!-- CARD HEADER -->
                     <div class="d-flex card-header justify-content-center">
-                        <h3>Login</h3>
+                        <h3>Welcome</h3>
                     </div>
                     
                     <!-- CARD BODY -->
@@ -47,12 +85,12 @@
                                     <div class="input-group-prepend">
                                       <span class="input-group-text"><i class="fas fa-key"></i></span>
                                     </div>
-                                    <input id='password' type="password" name="password" class="form-control" placeholder="user-password">
+                                    <input id='password' type="password" name="password" class="form-control" placeholder="password">
                             </div>
 
                             <!-- LOGIN BUTTON -->
                             <div class="d-flex justify-content-center form-group">
-                                <input type="submit" value="Login" class="btn btn-block btn-info">    
+                                <input type="submit" value="Login" class="btn btn-block btn-outline-dark">    
                             </div>
 
                             <!-- FORGOT PASSWORD BUTTON -->
@@ -64,7 +102,7 @@
 
                             <!-- AUTHENTICATION USING GOOGLE  -->
                             <div class="form-group">
-                                <a class="btn btn-block btn-danger" href="/auth/google">
+                                <a class="btn btn-block btn-outline-danger" href="/auth/google">
                                         <i class="fab fa-google"></i> Login using Google</a>
                                 </div>
                         </form>
@@ -74,11 +112,13 @@
                     <!-- CARD FOOTER -->
 
                     <!-- SIGNUP BUTTON -->
-                    <div class="d-flex card-footer justify-content-center">
-                        Dont have an account?
-                        <a href="/signup">Sign up here</a><br>
-                        <!-- file:///home/abhijith/Desktop/Colloqi/signup.html -->
- 
+                    <div class="card-footer">
+                        <div>
+                            Dont have an account?   
+                        </div>
+                        <div>
+                            <a href="/signup"> Sign up here</a><br>
+                        </div>
                     </div>
                 </div>
             </div>
