@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        
+        <title>
+            Sign Up page
+        </title>
+        
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+        <!-- <link rel="stylesheet" href="file:///home/abhijith/Desktop/Colloqi/bootstrap/css/bootstrap.min.css"> -->
+        
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+        <!-- <link rel="stylesheet" href="file:///home/abhijith/Desktop/Colloqi/font/css/all.css" > -->
+        
+        <style>
+        .form-control{
+          height: 50px;
+          padding: 6px 18px;
+        }
+        .form-group{
+          /* height: 50 px; */
+        }
+        .alert{
+          margin: 2px 0px 0px 0px;
+          /* width: 250px;
+          padding: 12px 10px; */
+
+        }
+        </style>
+
+    </head>
+    <body>
+        <div class="container">
+          <div class="d-flex h-100 justify-content-center ">
+            <div class="card mt-5 shadow-lg p-4 mb-4 bg-white">
+
+              <!-- CARD HEADER -->
+              <div class="d-flex card-header justify-content-center">
+                  <h3>Sign-Up</h3>
+              </div>
+                    
+              <!-- CARD BODY -->
+              <div class="card-body">
+                  <form class='form-signin' action='/signup', method='post' onsubmit="return registerValidation()">  
+
+                    <!-- USERNAME -->
+                    <div class="form-group input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        </div>
+                        <div>
+                          <input id='username' type="text" name="username" class="form-control" placeholder="Username" required>
+                        </div>
+                        <div id="usernameValid"  role="alert">
+                        </div>
+                    </div>
+
+                    <!-- EMAIL -->
+                    <div class="form-group input-group">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                            </div>
+                            <div>
+                              <input id='email' type="email" name="email" class="form-control" placeholder="user-email" required>
+                            </div>
+                            <div id="emailvalid" role="alert">
+                            </div>
+                    </div>
+
+                    <!-- PASSWORD -->
+                    <div class="form-group input-group">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text"><i class="fas fa-key"></i></span>
+                            </div>
+                            <div>
+                              <input id='password' type="password" name="password" class="form-control" placeholder="Enter password" required>
+                            </div>
+                            <div id="passwordvalid" role="alert">
+                            </div>
+                    </div>
+
+                    <!-- PASSWORD VALIDATION -->
+                    <div id="message" style="display: none">
+                      <div id="letter" class="alert alert-danger" role="alert">
+                          A <b>lowercase</b> letter
+                      </div>
+                      <div id="capital" class="alert alert-danger" role="alert">
+                          A <b>uppercase</b> letter
+                      </div>
+                      <div id="number" class="alert alert-danger" role="alert">
+                          A <b>number</b>
+                      </div>
+                      <div id="length"  class="alert alert-danger" role="alert">
+                          Minimum <b>8 characters</b>
+                      </div>
+                    </div>
+
+                    <!-- CONFIRM PASSWORD -->
+                    <div class="form-group input-group">
+                            <div class="input-group-prepend">
+                              <span class="input-group-text"><i class="fas fa-key"></i></span>
+                            </div>
+                            <div>
+                              <input id='verifyPassword' type="password" name="password2" class="form-control" placeholder="Confirm password" required>
+                            </div>
+                            <div id='confirmpasswordvalid' role="alert">
+                            </div>
+                    </div>
+
+                    <!-- SUBMIT /REGISTER BUTTON -->
+                    <div>
+                      <input type="submit" class="btn btn-block btn-primary" value="Submit">
+                    </div>
+
+
+                  </form>
+            
+              </div>
+
+            </div>  
+
+          </div>
+        </div>
+    </body>
+
+    <script>
+    function registerValidation(){
+      var name=document.getElementById('username').value;
+      var email=document.getElementById('email').value;
+      var password=document.getElementById('password').value;
+      var passagain=document.getElementById('verifyPassword').value;  
+      var userAlert=document.getElementById('usernameValid');
+      var emailAlert=document.getElementById('emailvalid');
+      var passwordalert=document.getElementById('passwordvalid');
+      var comfirmvalid=document.getElementById('confirmpasswordvalid');
+
+
+      if(name==''){
+        alert('Please enter the username');
+        return false
+      }
+      if(email==''){
+        alert('Please enter the email');
+        return false
+      }
+      if(password==''){
+        alert('Please enter the password');
+        return false
+      }
+      if(passagain==''){
+        alert("Please re-enter the password");
+        return false;
+      }
+      if (email.indexOf("@", 0) < 0)                 
+      { 
+        alert("Please enter a valid e-mail address."); 
+        email.focus(); 
+        return false; 
+      } 
+      if (email.indexOf(".", 0) < 0)                 
+      { 
+          window.alert("Please enter a valid e-mail address."); 
+          email.focus(); 
+          return false; 
+      } 
+      if(password!=passagain){
+        alert('Passwords do not match')
+        return false
+      }
+      if(passagain.length <6 || password.length<6){
+        alert('Password length is too small');
+        return false
+      }
+      else{
+        return true
+      }
+    }
+    
+    //password validator
+    var myInput=document.getElementById('password');
+    var letter = document.getElementById("letter");
+    var capital = document.getElementById("capital");
+    var number = document.getElementById("number");
+    var length = document.getElementById("length");
+
+    myInput.onfocus=function(){
+      document.getElementById('message').style.display='block';
+    }
+    myInput.onblur = function() {
+      document.getElementById("message").style.display = "none";
+    }
+
+    myInput.onkeyup=function(){
+      var lowercaseletters=/[a-z]/g;
+      if(myInput.value.match(lowercaseletters)){
+        letter.classList.remove('alert-danger');
+        letter.classList.add('alert-success');
+      }
+      else{
+        letter.classList.remove('alert-success');
+        letter.classList.add('alert-danger');
+      }
+
+      var upperCaseLetters = /[A-Z]/g;
+      if(myInput.value.match(upperCaseLetters)) { 
+        capital.classList.remove("alert-danger");
+        capital.classList.add("alert-success");
+      } else {
+        capital.classList.remove("alert-success");
+        capital.classList.add("alert-danger");
+      }
+
+      var numbers = /[0-9]/g;
+      if(myInput.value.match(numbers)) { 
+        number.classList.remove("alert-danger");
+        number.classList.add("alert-success");
+      } else {
+        number.classList.remove("alert-success");
+        number.classList.add("alert-danger");
+      }
+
+      if(myInput.value.length >= 8) {
+        length.classList.remove("alert-danger");
+        length.classList.add("alert-success");
+      } else {
+        length.classList.remove("alert-success");
+        length.classList.add("alert-danger");
+      }
+
+    }
+    </script>
+</html>

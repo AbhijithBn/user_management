@@ -1,11 +1,38 @@
+//express app-generator
 var express=require('express');
+
+//express router
 var router=express.Router();
+
+//database model
 var User=require('../models/user');//access the databse content
-router.use(express.static('public'));// for the use of html files
+
+//file server
+router.use(express.static('public'));// for the use of ejs files
+
+//encryption middleware
 var bcrypt = require('bcryptjs');//password authentications
 
+//body parser
 var bodyParser=require('body-parser');
+router.use(bodyParser.urlencoded({extended: true}))
 
+/*
+//image upload
+var multer=require('multer');
+
+// SET STORAGE for storing the image
+
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + '-' + Date.now())
+  }
+})
+var upload = multer({ storage: storage })
+*/
 
 //used to handle forgot password
 var async=require('async');
@@ -26,7 +53,7 @@ module.exports = function(passport){
 
 	/* GET login page. */
 	router.get('/', function(req, res) {
-        res.sendfile(__dirname+'/'+"login.html",{ message: req.flash('Login form') });
+        res.render("login.ejs");
 	});
 
 	/* Handle Login POST */
@@ -39,15 +66,15 @@ module.exports = function(passport){
 
 	/* GET Registration Page */
 	router.get('/signup', function(req, res){
-		res.sendfile(__dirname+'/'+"register.html",{ message: req.flash('Registration form') });
+		res.render("register.ejs");
 	});
 
 	
-	router.post('/signup', function(req, res)
+	router.post('/signup',function(req, res)
 	{
+
 		const { username, email, password, password2 } = req.body;
-		console.log("username= ",username,"email= ",email,"password= ",password,"2ndpassword= ",password2)
-	  
+		
 		if (!username || !email || !password || !password2) {
 		  console.log( 'Please enter all fields' );
 		}
@@ -64,7 +91,7 @@ module.exports = function(passport){
 		  User.findOne({ email: email }).then(user => {
 			if (user) {
 			  console.log( 'Email already exists' );
-			  res.sendFile(__dirname+'/'+'login.html');
+			  res.render('login.ejs');
 			} 
 			else 
 			{
@@ -92,13 +119,61 @@ module.exports = function(passport){
 			}
 		  });
 		}
-		});
-	
-	  
+	});
+
+	/*
+	//image upload
+	router.post('/uploadphoto', upload.single('picture'), function(req, res)
+	{
+    var img = fs.readFileSync(req.file.path);
+		var encode_image = img.toString('base64');
+
+		var finalImg = {
+					contentType: req.file.mimetype,
+					image:  new Buffer(encode_image, 'base64')
+			};
+		User.insertOne(finalImg, function(err, result)
+		{
+				console.log(result)
+				if (err) 
+					return console.log(err)
+		
+				console.log('saved to database')
+				res.redirect('/')
+		})
+	})
+
+	router.get('/photos', (req, res) => {
+		User.find().toArray((err, result) => {
+		 
+				const imgArray= result.map(element => element._id);
+							console.log(imgArray);
+		
+			if (err) return console.log(err)
+			res.send(imgArray)
+		
+		})
+	});
+
+	router.get('/photo/:id', (req, res) => {
+		var filename = req.params.id;
+		
+		User.findOne({'_id': ObjectId(filename) }, (err, result) => {
+		
+			if (err) return console.log(err)
+		
+			res.contentType('image/jpeg');
+			res.send(result.image.buffer)
+			
+			
+		})
+	})
+	*/
+
 
 	/* GET Home Page */
 	router.get('/home', isAuthenticated, function(req, res){
-		res.sendfile(__dirname+'/'+"main.html",{ message: req.flash('Content Page') });
+		res.render("main.ejs",{user:req.user});
 	});
 
 
@@ -122,7 +197,7 @@ module.exports = function(passport){
 
 	//forgot password
 	router.get('/forgot',function(req,res){
-		res.sendFile(__dirname+'/'+"forgot.html");
+		res.sendFile(__dirname+'/'+"forgot.ejs");
 		//console.log("Success in loading forgot password page");
 	})
 
@@ -199,7 +274,7 @@ module.exports = function(passport){
 	// 			req.flash('error', 'Password reset token is invalid or has expired.');
 	// 			return res.redirect('/forgot');
 	// 		}
-	// 		res.sendFile(__dirname+'/'+"reset.html", {token: req.params.token});
+	// 		res.sendFile(__dirname+'/'+"reset.ejs", {token: req.params.token});
 	// 	});
 	// });
 

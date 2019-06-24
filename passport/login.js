@@ -13,8 +13,10 @@ module.exports=function(passport){
    
     passport.use('login', new LocalStrategy(//where login is name of local strategy being used in this example
     function( username, password, done) 
-    { 
-        User.findOne({ 'username' :  username }||{'email':email}, 
+    {   
+        //login using email or username
+        var criteria = (username.indexOf('@') === -1) ? {username: username} : {email: username};
+        User.findOne(criteria, 
         function(err, user) {
             // In case of any error, return using the done method      
             if (err)
@@ -44,34 +46,34 @@ module.exports=function(passport){
 
 
 
-    passport.use('facebook',new FacebookStrategy({
-        clientID: configAuth.facebookAuth.clientID,
-        clientSecret: configAuth.facebookAuth.clientSecret,
-        callbackURL: configAuth.facebookAuth.callbackURL
-    },
-    function(accessToken, refreshToken, profile, cb)
-    {
-        User.findOne({ 'facebook.id': profile.id }, function (err, user) {
-            if(err)
-                return console.log(err);
-            if(user)
-                return console.log(null,user);
-            else{
-                var newUser=new User();
-                newUser.facebook.id=profile.id;
-                newUser.facebook.token=accessToken;
-                newUser.facebook.name=profile.name.givenName+' '+profile.name.familyName;
-                // newUser.facebook.email=profile.email[0].value;
-                newUser.save(function(err){
-                    if(err)
-                        throw err;
-                    return console.log(null,newUser); 
-                })
+    // passport.use('facebook',new FacebookStrategy({
+    //     clientID: configAuth.facebookAuth.clientID,
+    //     clientSecret: configAuth.facebookAuth.clientSecret,
+    //     callbackURL: configAuth.facebookAuth.callbackURL
+    // },
+    // function(accessToken, refreshToken, profile, cb)
+    // {
+    //     User.findOne({ 'facebook.id': profile.id }, function (err, user) {
+    //         if(err)
+    //             return console.log(err);
+    //         if(user)
+    //             return console.log(null,user);
+    //         else{
+    //             var newUser=new User();
+    //             newUser.facebook.id=profile.id;
+    //             newUser.facebook.token=accessToken;
+    //             newUser.facebook.name=profile.name.givenName+' '+profile.name.familyName;
+    //             // newUser.facebook.email=profile.email[0].value;
+    //             newUser.save(function(err){
+    //                 if(err)
+    //                     throw err;
+    //                 return console.log(null,newUser); 
+    //             })
 
-            }
-        });
-    }
-    ));
+    //         }
+    //     });
+    // }
+    // ));
 
 
     passport.use(new GoogleStrategy({
