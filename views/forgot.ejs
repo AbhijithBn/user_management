@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+            
         <title>
             Forgot password
         </title>
-
 
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
         <!-- <link rel="stylesheet" href="file:///home/abhijith/Desktop/Colloqi/bootstrap/css/bootstrap.min.css"> -->
@@ -19,43 +21,45 @@
                 background-color: rgb(8, 79, 100);
                 font-family: 'Arvo', serif;
             }
+            .card{
+                border-radius: 20px;
+            }
             .card-header{
-            border-bottom: 2px solid rgb(8, 79, 100);
-            background-color:white;
-            color: rgba(14, 125, 168, 0.972);
-          }
+                border-bottom:2px solid rgb(8, 79, 100);
+                background-color:white;
+                color: rgba(14, 125, 168, 0.972);
+            }
         </style>
-
     </head>
     <body>
         <div class="container">
             <div class="d-flex h-100 justify-content-center">
-                
                 <div class="card mt-5 shadow-lg p-4 mb-4 bg-white">
-
-                    <div class='d-flex card-header justify-content-center'>
-                        <i class="fas fa-lock fa-3x"></i>
+                    <!-- CARD HEADER -->
+                    <div class="d-flex card-header justify-content-center">
+                        <i class="fas fa-lock fa-2x"></i>
                     </div>
                     <div class="card-body">
-                            <form id="register-form" action='/forgot' role="form" autocomplete="off" class="form" method="post">
-            
-                                <div class="form-group">
-                                    <div class="input-group">
-                                    <span class="input-group-addon"><i class="glyphicon glyphicon-envelope color-blue"></i></span>
-                                    <input id="email" name="email" placeholder="email address" class="form-control"  type="email">
-                                    </div>
+                        <form action="/forgot" autocomplete="off" method="POST">
+                            <div class="form-group input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
                                 </div>
-                                <div class="form-group">
-                                    <input name="recover-submit" class="btn btn-lg btn-dark btn-block" value="Reset Password" type="submit">
+                                <div>
+                                    <input id="email" name="email" placeholder=" email address" class="form-control"  type="email">
                                 </div>
-                                
-                                <input type="hidden" class="hide" name="token" id="token" value=""> 
-                            </form>
+                            </div>
+                            <div class="form-group">
+                                <input name="recover-submit" class="btn btn-lg btn-dark btn-block" value="Reset Password" type="submit">
+                            </div>
+                            <input type="hidden" class="hide" name="token" id="token" value=""> 
+                        </form>
                     </div>
+
                 </div>
-                       
             </div>
         </div>
+
     </body>
 
 </html>
