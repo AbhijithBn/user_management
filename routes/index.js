@@ -16,6 +16,9 @@ var bcrypt = require('bcryptjs');//password authentications
 //body parser
 var bodyParser=require('body-parser');
 router.use(bodyParser.urlencoded({extended: true}))
+var flash = require('express-flash');
+router.use(flash());
+
 
 /*
 //image upload
@@ -176,15 +179,12 @@ module.exports = function(passport){
 		res.render("main.ejs",{user:req.user});
 	});
 
-
+	//facebook authetication
 	router.get('/auth/facebook', passport.authenticate('facebook', {scope: ['email']}));
-
 	router.get('/auth/facebook/callback', passport.authenticate('facebook', { successRedirect: '/home', failureRedirect: '/' }));
 
-
-
+	//Google authentication
 	router.get('/auth/google', passport.authenticate('google', {scope: ['profile','email']}));
-
 	router.get('/auth/google/callback', passport.authenticate('google', { successRedirect: '/home', failureRedirect: '/' }));
 
 	/* Handle Logout */
@@ -193,44 +193,36 @@ module.exports = function(passport){
 		res.redirect('/');
 	});
 
-
-
 	//forgot password
 	router.get('/forgot',function(req,res){
-		res.sendFile(__dirname+'/'+"forgot.ejs");
+		res.render("forgot.ejs");
 		//console.log("Success in loading forgot password page");
 	})
 
+
 	router.post('/forgot',function(req,res,next){
-		async.waterfall([// this waterfall function executes one function after another continuously
-			function(done) //generates 20bit random string in hexadecimal 
-			{
-				crypto.randomBytes(20, function(err, buf) {
-					var token = buf.toString('hex');
-					done(err, token);
+		async.waterfall([
+			function(done){
+				crypto.randomBytes(20,function(err,buf){
+					var token=buf.toString('hex');
+					done(err,token);
 				});
 			},
-
-			function(token, done) //checking if the email entered is existent in the database or not
-			{
-				User.findOne({ email: req.body.email }, function(err, user) {
-					console.log("email is ",req.body.email);
-					if (!user) // no user with that email address
-					{
-						console.log('error', 'No account with that email address exists.');
+			function(token,done){
+				User.findOne({email:req.body.email},function(err,user){
+					if(!user){
+						req.flash('error','No account with that email address exists.');
 						return res.redirect('/forgot');
 					}
 
-	
-					user.resetPasswordToken = token;//20bit token
-					user.resetPasswordExpires = Date.now() + 3600000; //  expires in 1 hour
+					user.resetPasswordToken = token;
+					user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
 	
 					user.save(function(err) {
 						done(err, token, user);
 					});
 				});
 			},
-
 			function(token, user, done) 
 			{
 				const smtpTransport = nodemailer.createTransport({
@@ -241,9 +233,9 @@ module.exports = function(passport){
 						type: 'OAuth2',
 						user:'b.n.abhijith@gmail.com',
 						clientId: '500226019228-jeuia4kl1ponqdg2qjlv98kc8fn9u4ks.apps.googleusercontent.com',
-						clientSecret: '9mekItXlYZakgcOYf2sH-wj3',
-						refreshToken: '1/aEThnTrtQ92nGU3sP8Y-cvRgpaECi2lyd0r9BgLn6r8',
-						accessToken: 'ya29.Glu_BtnBFuVzwpbpyMSzNJ5xOzYJwad1S1PcHU7wEz6fk3RvEY4f-Mgv1wZYGDkBES4Ex7CZxEyNXs-AADQ_eCsEjJ8luyyrwnxnTnNr7QFuEKStM-JyjKSgF_Ts'
+						clientSecret: 'wFu3RNZjbwMkRE4Euaq757Y4',
+						refreshToken: '1/3klIQeDEJ2bWcBP6MbZk5haPSg66GqjYpPPvqzXFoOs',
+						accessToken: 'ya29.GlsyB5BxfndYuKRSl-P1yqb24CcF-NxzSyaSCTIlrH02PNlvisgsVbVYh-oNgdBqEywessN8sTby45vJgoqXeKTU5nZUMi774CezSN1CSvySvL86XZRTEHHGG9sl'
 					}
 				});
 				var mailOptions = {
@@ -261,76 +253,90 @@ module.exports = function(passport){
 					done(err, 'done');
 				});
 			}
-		], function(err) {
-			if (err) return next(err);
+		],function(err){
+			if(err)
+				return next(err);
 			res.redirect('/forgot');
 		});
+	});
 
-	})
+	router.get('/reset/:token', function(req, res) {
+		User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+			if (!user) {
+				req.flash('error', 'Password reset token is invalid or has expired.');
+				return res.redirect('/forgot');
+			}
+			res.render("reset.ejs",{token: req.params.token});
+		});
+	});
 
-	// router.get('/reset/:token', function(req, res) {
-	// 	User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
-	// 		if (!user) {
-	// 			req.flash('error', 'Password reset token is invalid or has expired.');
-	// 			return res.redirect('/forgot');
-	// 		}
-	// 		res.sendFile(__dirname+'/'+"reset.ejs", {token: req.params.token});
-	// 	});
-	// });
+	router.post('/reset/:token', function(req, res) {
+		async.waterfall([
+			function(done) {
+				User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+					if (!user) {
+						req.flash('error', 'Password reset token is invalid or has expired.');
+						return res.redirect('back');
+					}
+					
+					bcrypt.genSalt(10, function(err, salt) 
+					{
+						bcrypt.hash(req.body.password, salt, (err, hash) => {
+							if (err) 
+								throw err;
+							user.password = hash;
+							user.save().then(user => {
+								req.flash(
+								'success_msg',
+								'You are now registered and can log in'
+								);
+								res.redirect('/');
+							})
+							.catch(err => console.log(err));
+						});
+					});
 
-	// router.post('/reset/:token', function(req, res) {
-	// 	async.waterfall([
-	// 		function(done) {
-	// 			User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
-	// 				if (!user) {
-	// 					req.flash('error', 'Password reset token is invalid or has expired.');
-	// 					return res.redirect('back');
-	// 				}
-	// 				if(req.body.password === req.body.confirm) {
-	// 					user.setPassword(req.body.password, function(err) {
-	// 						user.resetPasswordToken = undefined;
-	// 						user.resetPasswordExpires = undefined;
+					user.resetPasswordToken = undefined;
+					user.resetPasswordExpires = undefined;
 	
-	// 						user.save(function(err) {
-	// 							req.logIn(user, function(err) {
-	// 								done(err, user);
-	// 							});
-	// 						});
-	// 					})
-	// 				} else {
-	// 						req.flash("error", "Passwords do not match.");
-	// 						return res.redirect('back');
-	// 				}
-	// 			});
-	// 		},
-	// 		function(user, done) {
-	// 			var smtpTransport = nodemailer.createTransport({
-	// 				service: 'Gmail', 
-	// 				auth: {
-	// 					type: 'OAuth2',
-	// 					user:'b.n.abhijith@gmail.com',
-	// 					clientId: '500226019228-jeuia4kl1ponqdg2qjlv98kc8fn9u4ks.apps.googleusercontent.com',
-	// 					clientSecret: '9mekItXlYZakgcOYf2sH-wj3',
-	// 					refreshToken: '1/aEThnTrtQ92nGU3sP8Y-cvRgpaECi2lyd0r9BgLn6r8',
-	// 					accessToken: 'ya29.Glu_BtnBFuVzwpbpyMSzNJ5xOzYJwad1S1PcHU7wEz6fk3RvEY4f-Mgv1wZYGDkBES4Ex7CZxEyNXs-AADQ_eCsEjJ8luyyrwnxnTnNr7QFuEKStM-JyjKSgF_Ts'
-	// 				}
-	// 			});
-	// 			var mailOptions = {
-	// 				to: user.email,
-	// 				from: 'b.n.abhijith@mail.com',
-	// 				subject: 'Your password has been changed',
-	// 				text: 'Hello,\n\n' +
-	// 					'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
-	// 			};
-	// 			smtpTransport.sendMail(mailOptions, function(err) {
-	// 				req.flash('success', 'Success! Your password has been changed.');
-	// 				done(err);
-	// 			});
-	// 		}
-	// 	], function(err) {
-	// 		res.redirect('/');
-	// 	});
-	// });
+					user.save(function(err) {
+						req.logIn(user, function(err) {
+							done(err, user);
+						});
+					});
+				});
+			},
+			function(user, done) {
+			const smtpTransport = nodemailer.createTransport({
+				host: 'smtp.gmail.com',
+				port: 465,
+				secure: true,
+				auth: {
+					type: 'OAuth2',
+					user:'b.n.abhijith@gmail.com',
+					clientId: '500226019228-jeuia4kl1ponqdg2qjlv98kc8fn9u4ks.apps.googleusercontent.com',
+					clientSecret: 'wFu3RNZjbwMkRE4Euaq757Y4',
+					refreshToken: '1/3klIQeDEJ2bWcBP6MbZk5haPSg66GqjYpPPvqzXFoOs',
+					accessToken: 'ya29.GlsyB5BxfndYuKRSl-P1yqb24CcF-NxzSyaSCTIlrH02PNlvisgsVbVYh-oNgdBqEywessN8sTby45vJgoqXeKTU5nZUMi774CezSN1CSvySvL86XZRTEHHGG9sl'
+				}
+			});
+			var mailOptions = {
+				to: user.email,
+				from: 'b.n.abhijith@gmail.com',
+				subject: 'Node.js Password Reset',
+				text: 'Hello,\n\n' +
+          'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
+			};
+			smtpTransport.sendMail(mailOptions, function(err) {
+				console.log('mail sent');
+        req.flash('success', 'Success! Your password has been changed.');
+				done(err, 'done');
+			});
+			}
+		], function(err) {
+			res.redirect('/');
+		});
+	});
 	
 
 
