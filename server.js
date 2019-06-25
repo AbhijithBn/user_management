@@ -23,7 +23,7 @@ app.set('view engine','ejs');
 var dbConfig = require('./db');
 var mongoose = require('mongoose');
 // Connect to DB
-mongoose.connect(dbConfig.url);
+mongoose.connect(dbConfig.url,{useNewUrlParser:true});
 
 //configure passport
 var passport=require('passport');//passport.js for authentication
