@@ -86,24 +86,25 @@ module.exports=function(passport){
 	    			if(err)
 	    				return done(err);
 	    			if(user)
-	    				return done(null, user);
+	    				return done(null, user);//here err is null
 	    			else {
 	    				var newUser = new User();
 	    				newUser.google.id = profile.id;
 	    				newUser.google.token = accessToken;
 	    				newUser.google.name = profile.displayName;
-	    				newUser.google.email = profile.emails[0].value;
+                        newUser.google.email = profile.emails[0].value;
+                        newUser.email=profile.emails[0].value;
+                        newUser.username=profile.displayName;
 
 	    				newUser.save(function(err){
 	    					if(err)
 	    						throw err;
 	    					return done(null, newUser);
 	    				})
-	    				console.log(profile);
+	    				// console.log("ID:"+profile.id+"Token:"+accessToken+" Name :"+profile.displayName+"Email:"+profile.emails[0].value);
 	    			}
 	    		});
 	    }
-
     ));
     
 
