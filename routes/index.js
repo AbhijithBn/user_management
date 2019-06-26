@@ -141,7 +141,7 @@ module.exports = function(passport){
 					to: newUser.email,
 					from: 'b.n.abhijith@gmail.com',
 					subject: 'Your account verification',
-					text: 'You are receiving this because you (or someone else) have regitered.\n\n' +
+					text: 'You are receiving this because you (or someone else) have registered.\n\n' +
 						'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
 						'http://' + req.headers.host + '/verify/' + token + '\n\n' +
 						'If you did not request this, please ignore this email and your password will remain unchanged.\n'
@@ -180,56 +180,6 @@ module.exports = function(passport){
 			// console.log("User before updating:",user);
 		})
 	});
-
-	/*
-	//image upload
-	router.post('/uploadphoto', upload.single('picture'), function(req, res)
-	{
-    var img = fs.readFileSync(req.file.path);
-		var encode_image = img.toString('base64');
-
-		var finalImg = {
-					contentType: req.file.mimetype,
-					image:  new Buffer(encode_image, 'base64')
-			};
-		User.insertOne(finalImg, function(err, result)
-		{
-				console.log(result)
-				if (err) 
-					return console.log(err)
-		
-				console.log('saved to database')
-				res.redirect('/')
-		})
-	})
-
-	router.get('/photos', (req, res) => {
-		User.find().toArray((err, result) => {
-		 
-				const imgArray= result.map(element => element._id);
-							console.log(imgArray);
-		
-			if (err) return console.log(err)
-			res.send(imgArray)
-		
-		})
-	});
-
-	router.get('/photo/:id', (req, res) => {
-		var filename = req.params.id;
-		
-		User.findOne({'_id': ObjectId(filename) }, (err, result) => {
-		
-			if (err) return console.log(err)
-		
-			res.contentType('image/jpeg');
-			res.send(result.image.buffer)
-			
-			
-		})
-	})
-	*/
-
 
 	/* GET Home Page */
 	router.get('/home', isAuthenticated, function(req, res){
