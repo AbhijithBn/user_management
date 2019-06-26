@@ -16,8 +16,7 @@ module.exports=function(passport){
     {   
         //login using email or username
         var criteria = (username.indexOf('@') === -1) ? {username: username} : {email: username};
-        User.findOne(criteria, 
-        function(err, user) {
+        User.findOne(criteria, function(err, user) {
             // In case of any error, return using the done method      
             if (err)
               return done(err);
@@ -30,6 +29,10 @@ module.exports=function(passport){
             if (!isValidPassword(user, password)){
                 console.log('Invalid Password');
                 return done(null, false);
+            }
+            if(user.confirmed!=true){
+                console.log('The user hasnt verified their account');
+                return done(null,false);
             }
             // User and password both match, return user from 
             // done method which will be treated like success
@@ -94,14 +97,14 @@ module.exports=function(passport){
 	    				newUser.google.name = profile.displayName;
                         newUser.google.email = profile.emails[0].value;
                         newUser.email=profile.emails[0].value;
-                        newUser.username=profile.displayName;
+                        newUser.username=profile.emails[0].value;
 
 	    				newUser.save(function(err){
 	    					if(err)
 	    						throw err;
 	    					return done(null, newUser);
 	    				})
-	    				// console.log("ID:"+profile.id+"Token:"+accessToken+" Name :"+profile.displayName+"Email:"+profile.emails[0].value);
+	    				console.log(profile);
 	    			}
 	    		});
 	    }

@@ -72,56 +72,113 @@ module.exports = function(passport){
 		res.render("register.ejs");
 	});
 
-	
-	router.post('/signup',function(req, res)
-	{
-
-		const { username, email, password, password2 } = req.body;
-		
-		if (!username || !email || !password || !password2) {
-		  console.log( 'Please enter all fields' );
-		}
-		if (password != password2) {
-		  console.log(  'Passwords do not match' );
-		}
-	
-		if (password.length < 6) {
-		  console.log(  'Password must be at least 6 characters' );
-		}
-	   
-		else 
-		{
-		  User.findOne({ email: email }).then(user => {
-			if (user) {
-			  console.log( 'Email already exists' );
-			  res.render('login.ejs');
-			} 
-			else 
-			{
-			  const newUser = new User({
-				username,
-				email,
-				password
-			  });
-	  
-			  bcrypt.genSalt(10, (err, salt) => {
-				bcrypt.hash(newUser.password, salt, (err, hash) => {
-					if (err) 
-						throw err;
-				  newUser.password = hash;
-				  newUser.save().then(user => {
-					  req.flash(
-						'success_msg',
-						'You are now registered and can log in'
-					  );
-					  res.redirect('/');
-					})
-					.catch(err => console.log(err));
+	// POST REGISTRATION PAGE
+	router.post('/signup',function(req, res,next){
+		async.waterfall([
+			// GENERATION OF TOKEN
+			function(done){
+				crypto.randomBytes(20,function(err,buf){
+					var token=buf.toString('hex');
+					done(err,token);
 				});
-			  });
+			},
+			//CHECK DATABASE FOR USER
+			function(token,done){
+
+				User.findOne({ email: req.body.email }).then(user => {
+					if (user) {
+						console.log( 'Email already exists' );
+						res.redirect('/');
+					} 
+					else 
+					{
+						const username=req.body.username;
+						const email=req.body.email;
+						const password=req.body.password;
+						
+						const newUser = new User({
+						username,
+						email,
+						password
+						});
+
+						newUser.emailVerifyToken=token,
+						newUser.emailVerifyDate=Date.now()+3600000,
+				
+						bcrypt.genSalt(10, function(err, salt){
+							bcrypt.hash(newUser.password, salt, function(err, hash)
+							{
+								if (err) 
+									throw err;
+								newUser.password = hash;
+								newUser.save(function(err)
+								{
+									done(err,token,newUser);
+								})
+								
+							});
+						});
+						
+					}
+				});
+			},
+			function(token,newUser,done){
+				console.log("the email of the client is :",newUser.email);
+				const smtpTransport = nodemailer.createTransport({
+					host: 'smtp.gmail.com',
+					port: 465,
+					secure: true,
+					auth: {
+						type: 'OAuth2',
+						user:'b.n.abhijith@gmail.com',
+						clientId: '500226019228-jeuia4kl1ponqdg2qjlv98kc8fn9u4ks.apps.googleusercontent.com',
+						clientSecret: 'wFu3RNZjbwMkRE4Euaq757Y4',
+						refreshToken: '1/3klIQeDEJ2bWcBP6MbZk5haPSg66GqjYpPPvqzXFoOs',
+						accessToken: 'ya29.GlsyB5BxfndYuKRSl-P1yqb24CcF-NxzSyaSCTIlrH02PNlvisgsVbVYh-oNgdBqEywessN8sTby45vJgoqXeKTU5nZUMi774CezSN1CSvySvL86XZRTEHHGG9sl'
+					}
+				});
+				var mailOptions = {
+					to: newUser.email,
+					from: 'b.n.abhijith@gmail.com',
+					subject: 'Your account verification',
+					text: 'You are receiving this because you (or someone else) have regitered.\n\n' +
+						'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+						'http://' + req.headers.host + '/verify/' + token + '\n\n' +
+						'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+				};
+				smtpTransport.sendMail(mailOptions, function(err) {
+					console.log('mail sent');
+					req.flash('success', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
+					done(err, 'done');
+				});
+
+				res.redirect('/');
 			}
-		  });
-		}
+		],function(err){
+			if(err)
+				return next(err);
+			res.redirect('/');
+		});
+	});
+
+	router.get('/verify/:token',function(req,res){
+		User.findOne({emailVerifyToken:req.params.token,emailVerifyDate:{$gt:Date.now()}},function(err,user){
+			if(!user){
+				console.log("Email verification token is invalid or has expired");
+				return res.redirect('/');
+			}
+			console.log('Email verification token is valid')
+			res.redirect('/');
+			// console.log("User before updating",user);
+			user.confirmed=true;
+			user.emailVerifyToken=undefined;
+			user.emailVerifyDate=undefined;
+			user.save(function(err){
+				console.log("Error in updating the confirmed user");
+			});
+
+			// console.log("User before updating:",user);
+		})
 	});
 
 	/*
@@ -198,7 +255,6 @@ module.exports = function(passport){
 		res.render("forgot.ejs");
 		//console.log("Success in loading forgot password page");
 	})
-
 
 	router.post('/forgot',function(req,res,next){
 		async.waterfall([
